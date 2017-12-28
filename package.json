@@ -1,0 +1,22 @@
+{
+  "name": "desktop-stock-dashboard",
+  "version": "1.0.0",
+  "description": "Stock Dashboard for desktops",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airloaf/Desktop-Stock-Dashboard.git"
+  },
+  "author": "Vikram Singh vikzilla18@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/airloaf/Desktop-Stock-Dashboard/issues"
+  },
+  "homepage": "https://github.com/airloaf/Desktop-Stock-Dashboard#readme",
+  "dependencies": {
+    "electron": "^1.7.10"
+  }
+}
