@@ -1,5 +1,6 @@
-// Get the ipcRenderer
+// import
 const {ipcRenderer} = require('electron');
+const {Chart} = require("chart.js");
 
 // Get the elements when the window loads
 window.onload = function(){
@@ -42,7 +43,41 @@ function addItem(e, item){
 
 // Gets the stock clicked on
 function getStockData(e){
+
+  // Turn on the loading ui element
+  var loadingSpinner = document.querySelector("#loading-spinner");
+
+  // Gets the stock item clicked on and sends the item to the main process
   var stockTicker = e.toElement.innerHTML;
+  var stockRequest = {
+    function: "SMA",
+    symbol: stockTicker,
+    interval: "weekly",
+    time_period: 10,
+    series_type: "open"
+  }
+  ipcRenderer.send("get:stock", stockRequest);
+}
+
+// Stock data was returned
+function stockDataReturned(e, stockData){
+
+  var context = document.querySelector("#stock-canvas").getContext("2d");
+  var myChart = new Chart(context, {
+    type: "line",
+    data: {
+      labels: stockData["labels"],
+      datasets: [
+        {
+          label: stockData["function"],
+          data: stockData["data"]
+        }
+      ]
+    }
+  })
+
+
 }
 
 ipcRenderer.on("add:stock", (e, item)=>addItem(e, item));
+ipcRenderer.on("data:stock", (e, stockData)=>stockDataReturned(e, stockData))

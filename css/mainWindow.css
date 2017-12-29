@@ -1,6 +1,5 @@
 body{
   overflow: hidden;
-  background-color: #666666;
 }
 .wrapper{
   display:grid;
