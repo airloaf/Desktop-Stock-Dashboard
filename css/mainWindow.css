@@ -18,3 +18,12 @@ body{
   height: 100vh;
   overflow-y: auto;
 }
+#loading-spinner{
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+}
+#stock-canvas{
+  //width: 100%;
+}

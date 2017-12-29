@@ -47,13 +47,13 @@ const mainMenuTemplate = [
 function createWindow(){
   // Create a new window with width/height of 600
   mainWindow = new BrowserWindow({
-    width: 600,
-    height: 600
+    width: 800,
+    height: 500
   });
 
   // load the windows contents
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'mainWindow.html'),
+    pathname: path.join(__dirname, 'html/mainWindow.html'),
     protocol: 'file:',
     slashes: true
   }));
@@ -83,7 +83,7 @@ function createAddWindow(){
   addWindow.setMenu(null);
 
   addWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'addWindow.html'),
+    pathname: path.join(__dirname, 'html/addWindow.html'),
     protocol: 'file:',
     slashes: true
   }));
