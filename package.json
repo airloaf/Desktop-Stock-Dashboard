@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/airloaf/Desktop-Stock-Dashboard#readme",
   "dependencies": {
-    "electron": "^1.7.10"
+    "electron": "^1.7.10",
+    "materialize-css": "^0.100.2"
   }
 }

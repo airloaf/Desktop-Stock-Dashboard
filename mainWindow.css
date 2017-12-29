@@ -1,0 +1,20 @@
+body{
+  overflow: hidden;
+  background-color: #666666;
+}
+.wrapper{
+  display:grid;
+  grid-template-columns: 15% 85%;
+}
+.tickers{
+  height: 90vh;
+  overflow-y: auto;
+}
+.add-ticker{
+  height: 10vh;
+  width: 100%;
+}
+.stats{
+  height: 100vh;
+  overflow-y: auto;
+}
