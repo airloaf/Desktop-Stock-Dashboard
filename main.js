@@ -163,6 +163,7 @@ function getStock(e, item){
 
       // Send the stock data to the window
       mainWindow.webContents.send("data:stock", stockData);
+      stockData = null;
 
     })
 

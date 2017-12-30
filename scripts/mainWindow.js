@@ -2,11 +2,17 @@
 const {ipcRenderer} = require('electron');
 const {Chart} = require("chart.js");
 
+let context;
+let stockChart;
+
+
 // Get the elements when the window loads
 window.onload = function(){
   // Set the event listener for the button
   var button = document.getElementById('add-stock')
   button.addEventListener('click', addStock);
+
+  context = document.querySelector("#stock-canvas").getContext("2d");
 }
 
 // Executed when add stock button is pressed
@@ -61,9 +67,12 @@ function getStockData(e){
 
 // Stock data was returned
 function stockDataReturned(e, stockData){
+  console.log("Data Sent")
 
-  var context = document.querySelector("#stock-canvas").getContext("2d");
-  var myChart = new Chart(context, {
+  if(stockChart != null)
+    stockChart.destroy();
+
+  stockChart = new Chart(context, {
     type: "line",
     data: {
       labels: stockData["labels"],
@@ -75,6 +84,8 @@ function stockDataReturned(e, stockData){
       ]
     }
   })
+
+  stockData = null;
 
 
 }
