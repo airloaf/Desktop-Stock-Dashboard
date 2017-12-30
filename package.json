@@ -19,6 +19,7 @@
   "dependencies": {
     "chart.js": "^2.7.1",
     "electron": "^1.7.10",
+    "electron-settings": "^3.1.4",
     "fs-jetpack": "^1.2.0",
     "materialize-css": "^0.100.2"
   }

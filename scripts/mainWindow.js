@@ -69,6 +69,7 @@ function getStockData(e){
 function stockDataReturned(e, stockData){
   console.log("Data Sent")
 
+  // Destroy the stock chart if it's been instantiated
   if(stockChart != null)
     stockChart.destroy();
 
@@ -84,8 +85,6 @@ function stockDataReturned(e, stockData){
       ]
     }
   })
-
-  stockData = null;
 
 
 }

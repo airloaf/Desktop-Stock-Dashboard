@@ -3,6 +3,7 @@ const electron = require("electron");
 const url = require('url');
 const path = require('path');
 const https = require("https");
+const settings = require("electron-settings")
 
 const $ = require("jquery");
 
@@ -12,6 +13,7 @@ const {app, BrowserWindow, Menu, ipcMain} = electron;
 // windows
 let mainWindow;
 let addWindow;
+let settingsWindow;
 
 // Menu template for the main menu
 const mainMenuTemplate = [
@@ -23,6 +25,12 @@ const mainMenuTemplate = [
       },
       {
         label: "save"
+      },
+      {
+        label: "settings",
+        click(){
+            createSettingsWindow();
+        }
       },
       {
         label: "close"
@@ -66,6 +74,11 @@ function createWindow(){
   var mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   Menu.setApplicationMenu(mainMenu);
 
+  // Set api-key to demo by default
+  if(!settings.has('apikey'))
+    settings.set('apikey', 'demo');
+
+
   // Make it so that the whole app quits when the window is closed
   mainWindow.on('closed', function(){
     app.quit();
@@ -82,9 +95,10 @@ function createAddWindow(){
     modal: true
   });
 
-  // set the menu to null
+  // no menu
   addWindow.setMenu(null);
 
+  // Load the html
   addWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'html/addWindow.html'),
     protocol: 'file:',
@@ -96,6 +110,32 @@ function createAddWindow(){
     addWindow = null;
   })
 
+}
+
+// Create the settings window
+function createSettingsWindow(){
+  // Create the settings window
+  settingsWindow = new BrowserWindow({
+    width: 300,
+    height: 200,
+    parent: mainWindow,
+    modal: true
+  });
+
+  // no menu
+  settingsWindow.setMenu(null);
+
+  // load the html
+  settingsWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'html/settingsWindow.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+
+  // Sets the settings window to null when closed (Garbage Collection)
+  settingsWindow.on("close", function(){
+    settingsWindow = null;
+  })
 }
 
 // Add stock item
@@ -112,7 +152,7 @@ function getStock(e, item){
   // send back to the main window with a reponse code
 
   // Get stock URL
-  var stockURL = getStockURL(item.function, item.symbol, item.interval, item.time_period, item.series_type, "demo");
+  var stockURL = getStockURL(item);
 
   // Get request JSON
   https.get(stockURL, (res)=>{
@@ -174,12 +214,20 @@ function getStock(e, item){
 
 }
 
-function getStockURL(func, sym, interval, time_period, series_type, apikey){
+function getStockURL(item){
 
-  return "https://www.alphavantage.co/query?function=" + func + "&symbol=" + sym
-  + "&interval=" + interval + "&time_period=" + time_period + "&series_type=" + series_type
+  var apikey = settings.get('apikey');
+
+  return "https://www.alphavantage.co/query?function=" + item.function + "&symbol=" + item.symbol
+  + "&interval=" + item.interval + "&time_period=" + item.time_period + "&series_type=" + item.series_type
   + "&apikey=" + apikey;
 
+}
+
+// Set the api key
+function setkey(e, item){
+  settings.set("apikey", item);
+  settingsWindow.close();
 }
 
 // Wait for the app to become ready to make a window
@@ -189,3 +237,4 @@ app.on('ready', createWindow)
 ipcMain.on("open:stock", createAddWindow);
 ipcMain.on("add:stock", (e, item) => addStock(e, item));
 ipcMain.on("get:stock", (e, item) => getStock(e, item));
+ipcMain.on("set:apikey", (e, item) => setkey(e, item));
