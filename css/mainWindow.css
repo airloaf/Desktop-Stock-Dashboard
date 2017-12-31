@@ -16,10 +16,8 @@ body{
 .stats{
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
-#loading-spinner{
-  display: none;
-  position: fixed;
-  left: 50%;
-  top: 50%;
+.progress{
+  display: visible;
 }

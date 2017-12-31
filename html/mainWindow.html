@@ -4,10 +4,11 @@
   <head>
     <title>Stock Dashboard</title>
 
-    <!-- import materalize-css -->
-    <link rel="stylesheet" type="text/css" href="../node_modules/materialize-css/dist/css/materialize.min.css">
+    <!-- <! import materalize-css >    <link rel="stylesheet" type="text/css" href="../node_modules/materialize-css/dist/css/materialize.min.css">-->
     <!-- import mainWindow.css -->
     <link rel="stylesheet" type="text/css" href="../css/mainWindow.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 
     <!-- import mainWindow.js -->
     <script src="../scripts/mainWindow.js"></script>
@@ -21,41 +22,17 @@
       <!--Div for the side menu-->
       <div id="side-menu">
         <!--Button for the stocks-->
-        <button class="waves-effect waves-light btn add-ticker" id="add-stock">Add</button>
-
+        <button class="btn btn-primary add-ticker" id="add-stock">Add</button>
         <!--Tickers-->
         <div class="tickers">
-          <ul id="ticker-list">
-            <!-- add tickers here -->
-            <!--
-            <a class="collection-item">ITEM</a>
-            -->
-          </ul>
-        </div>
-      </div>
-
-      <div id="stats-page" class="stats">
-
-        <!--Loading div-->
-        <div class="preloader-wrapper big active" id="loading-spinner">
-          <div class="spinner-layer spinner-blue-only">
-            <div class="circle-clipper left">
-              <div class="circle"></div>
-                </div><div class="gap-patch">
-                  <div class="circle"></div>
-                </div><div class="circle-clipper right">
-              <div class="circle"></div>
-            </div>
-          </div>
+          <ul id="ticker-list"></ul>
         </div>
 
-        <!-- ACTUAL STATS PAGE -->
-        <canvas id="stock-canvas"></canvas>
-
       </div>
+
+      <div id="stats-page" class="stats"> </div>
 
     </div>
 
   </body>
-
 </html>
