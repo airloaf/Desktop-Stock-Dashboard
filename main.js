@@ -15,6 +15,9 @@ let mainWindow;
 let addWindow;
 let settingsWindow;
 
+// set to production
+process.env.NODE_ENV = "production";
+
 // Menu template for the main menu
 const mainMenuTemplate = [
   {
