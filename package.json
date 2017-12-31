@@ -4,7 +4,10 @@
   "description": "Stock Dashboard for desktops",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --out=release-builds",
+    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Desktop Stock Dashboard\"",
+    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64  --out=release-builds"
   },
   "repository": {
     "type": "git",
@@ -23,5 +26,8 @@
     "electron-settings": "^3.1.4",
     "fs-jetpack": "^1.2.0",
     "materialize-css": "^0.100.2"
+  },
+  "devDependencies": {
+    "electron-packager": "^10.1.0"
   }
 }

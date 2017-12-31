@@ -21,23 +21,17 @@ const mainMenuTemplate = [
     label: "file",
     submenu: [
       {
-        label: "open"
-      },
-      {
-        label: "save"
-      },
-      {
         label: "settings",
         click(){
             createSettingsWindow();
         }
-      },
-      {
-        label: "close"
       }
     ]
-  },
-  {
+  }
+];
+
+if(process.env.NODE_ENV != "production"){
+  var devTool = {
     label: "Developer Tools",
     submenu:[
       {
@@ -52,7 +46,9 @@ const mainMenuTemplate = [
       }
     ]
   }
-];
+
+  mainMenuTemplate.push(devTool);
+}
 
 // Create the main window
 function createWindow(){
