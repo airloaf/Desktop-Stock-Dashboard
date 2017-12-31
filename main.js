@@ -146,71 +146,86 @@ function addStock(e, item){
   addWindow.close();
 }
 
-// Get and return stock data
-function getStock(e, item){
-  // Get the stock data via jsonGet
-  // send back to the main window with a reponse code
+function sendData(e, item){
+  var requestCount = item["total_requests"];
+  var requests = item["requests"];
 
-  // Get stock URL
-  var stockURL = getStockURL(item);
+  // iterate through each request
+  for(var i = 0; i < requestCount; i++){
+    // do the current request
+    var currentRequest = requests[i];
+    getRequest(i, currentRequest);
 
-  // Get request JSON
-  https.get(stockURL, (res)=>{
-    // console.log("statusCode:", res.statusCode);
-    // console.log("headers", res.headers);
+  }
 
-    // variable to hold output stream
-    var httpsOut = "";
+}
 
-    // Add to output stream
-    res.on("data", (d)=>{
-      httpsOut += d;
-    })
+function getRequest(index, request){
+  // get the stock url and data
+  var url = getStockURL(request);
+  var jsonData = getJSONStock(url, request["function"], index);
 
-    // End stream
-    res.on("end", ()=>{
+}
 
-      // Full JSON output
-      var stockJSON = JSON.parse(httpsOut);
-      // Key to access the data
-      var dataKey = "Technical Analysis: " + item.function;
+function getJSONStock(stockURL, funcName, index){
+  // do an https get request
+  https.get(stockURL, (res) =>{
+      // hold the output stream from the function
+      var httpsOut = "";
 
-      // variable to reference the stock prices
-      var stockPrices = stockJSON[dataKey];
+      // append data
+      res.on("data", (d)=>{
+        httpsOut += d;
+      })
 
-      // Dates and data
-      var dates = [];
-      var data = [];
+      res.on('end', ()=>{
+        // get the json output
+        var stockJSON = JSON.parse(httpsOut);
+        getData(stockJSON, funcName, index);
+
+
+      })
+
+      // log the error
+  }).on('error', (e)=>{
+    console.log(e);
+  })
+
+}
+
+function getData(jsonData, funcName, index){
+
+  stockPrices = jsonData["Technical Analysis: " + funcName];
+
+  switch(funcName){
+    case "SMA":
+    case "EMA":
+
+    var dates = [];
+    var data = [];
 
       // Get the data
       for (var key in stockPrices) {
         if (stockPrices.hasOwnProperty(key)) {
           dates.push(key);
-          data.push((stockPrices[key])[item.function]);
+          data.push((stockPrices[key])[funcName]);
         }
       }
 
-      // Reverse the data
-      data.reverse();
       dates.reverse();
+      data.reverse();
 
-      // Create object to hold data
-      var stockData ={
-        "labels"    : dates,
-        "data"      : data,
-        "function"  : item["function"]
+      var stockData = {
+        "labels": dates,
+        "data" : data,
+        "function" : funcName,
+        "index" : index
       }
 
-      // Send the stock data to the window
       mainWindow.webContents.send("data:stock", stockData);
-      stockData = null;
 
-    })
-
-  // Error in get request
-  }).on('error', (e)=>{
-    console.log(e);
-  })
+      break;
+  }
 
 }
 
@@ -236,5 +251,5 @@ app.on('ready', createWindow)
 // Listen to the ipc main
 ipcMain.on("open:stock", createAddWindow);
 ipcMain.on("add:stock", (e, item) => addStock(e, item));
-ipcMain.on("get:stock", (e, item) => getStock(e, item));
+ipcMain.on("get:data", (e, item) => sendData(e, item));
 ipcMain.on("set:apikey", (e, item) => setkey(e, item));

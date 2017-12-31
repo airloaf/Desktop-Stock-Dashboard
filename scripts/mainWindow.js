@@ -6,6 +6,7 @@ const $ = require("jquery")
 let context;
 let stockChart;
 let functionCount;
+let stockSym;
 
 // Get the elements when the window loads
 window.onload = function(){
@@ -51,25 +52,13 @@ function addItem(e, item){
 // Gets the stock clicked on
 function getStockData(e){
 
-/*
-  // Turn on the loading ui element
-  var loadingSpinner = document.querySelector("#loading-spinner");
-
-  // Gets the stock item clicked on and sends the item to the main process
-  var stockTicker = e.toElement.innerHTML;
-  var stockRequest = {
-    function: "SMA",
-    symbol: stockTicker,
-    interval: "weekly",
-    time_period: 10,
-    series_type: "open"
-  }
-  ipcRenderer.send("get:stock", stockRequest);
-*/
-
   // Clear stats page
   var statsPage = document.getElementById("stats-page");
   statsPage.innerHTML = "";
+
+  functionCount = 0;
+  stockSym = e.target.text;
+  console.log(stockSym);
 
   createForm(statsPage);
 
@@ -189,6 +178,7 @@ function createButtons(formRow){
   buttonGetData.innerHTML="Get Data";
 
   buttonAddFunctions.addEventListener("click", addFunction);
+  buttonGetData.addEventListener("click", getFunctions);
 
   div.appendChild(buttonAddFunctions);
   div2.appendChild(buttonGetData);
@@ -217,7 +207,6 @@ function addFunction(){
   form.appendChild(document.createElement("hr"))
 
 }
-
 function addFunctionRow(functionDiv){
 
   // create form row
@@ -259,7 +248,6 @@ function addFunctionRow(functionDiv){
   selectChanged(select);
 
 }
-
 function addFunctionOptions(select){
 
     var optionSMA = document.createElement("option");
@@ -274,7 +262,6 @@ function addFunctionOptions(select){
     select.appendChild(optionXMA);
 
 }
-
 function selectChanged(target){
   // Get the parent
   var select = target;
@@ -286,7 +273,6 @@ function selectChanged(target){
 
 
 }
-
 function addFunctionParameters(funcName, parent){
   switch(funcName){
     case "SMA":
@@ -297,7 +283,6 @@ function addFunctionParameters(funcName, parent){
   }
 
 }
-
 function addSMALikeFunctions(parent){
 
   // remove previous div
@@ -323,7 +308,6 @@ function addSMALikeFunctions(parent){
   parent.appendChild(inputDiv);
 
 }
-
 function addTimePeriodInput(formRow, parent){
   var col = document.createElement("div");
   col.className = "col";
@@ -337,7 +321,8 @@ function addTimePeriodInput(formRow, parent){
   labelCol.className="col";
 
   var label = document.createElement("label");
-  label.innerHTML="Time Period";
+  label.innerHTML="Data Points per Calculation";
+  label.className="input-group-text";
   label.setAttribute("for", input.id);
 
   col.appendChild(input);
@@ -347,7 +332,6 @@ function addTimePeriodInput(formRow, parent){
   formRow.appendChild(labelCol);
 
 }
-
 function addSeriesInput(formRow, parent){
 
   var seriesCol = document.createElement("div");
@@ -363,7 +347,8 @@ function addSeriesInput(formRow, parent){
   labelCol.className="col";
 
   var label = document.createElement("label");
-  label.innerHTML="Series type";
+  label.innerHTML="Price Type";
+  label.className="input-group-text";
   label.setAttribute("for", series.id);
 
   labelCol.appendChild(label);
@@ -372,7 +357,6 @@ function addSeriesInput(formRow, parent){
   formRow.appendChild(labelCol);
 
 }
-
 function addSeriesOptions(series){
   var closeOption = document.createElement("option");
   closeOption.text="close";
@@ -399,27 +383,107 @@ function addSeriesOptions(series){
 
 }
 
+function getFunctions(){
+  // hold all the requests temporarily
+  var requests = [];
+
+  var time_interval = document.getElementById("time-interval-select").value;
+  var stock_symbol = stockSym;
+
+  // iterate through each function ad get the associated data
+  for(var i = 0; i < functionCount; i++){
+    var function_type = document.getElementById("function: " + i).value;
+    var time_period = document.getElementById("time_period: " + i).value;
+    var series_type = document.getElementById("series_type: " + i).value;
+
+    // Bundle into request
+    var requestI = {
+      "function": function_type,
+      "symbol": stock_symbol,
+      "interval": time_interval,
+      "time_period": time_period,
+      "series_type": series_type
+    }
+
+    requests.push(requestI);
+
+  }
+
+  // object to hold the requests
+  var totalRequests = {
+    "total_requests": functionCount,
+    "requests": requests
+  }
+
+  // send to main.js
+  ipcRenderer.send("get:data", totalRequests);
+
+  //
+  setToLoad();
+
+}
+
+// replace forms with loading screens
+function setToLoad(){
+
+  var statsPage = document.getElementById("stats-page");
+  statsPage.innerHTML = "";
+
+  for(var i = 0; i < functionCount; i++){
+    var sectionDiv = document.createElement("div");
+    sectionDiv.id=("section: " + i);
+    var loader = document.createElement("div");
+    loader.className="loader";
+
+    sectionDiv.appendChild(loader);
+    statsPage.appendChild(sectionDiv);
+    statsPage.appendChild(document.createElement("hr"));
+  }
+
+}
 
 // Stock data was returned
 function stockDataReturned(e, stockData){
-  console.log("Data Sent")
+  console.log("Data Sent: " + stockData["index"]);
+  console.log(stockData);
 
-  // Destroy the stock chart if it's been instantiated
-  if(stockChart != null)
-    stockChart.destroy();
+  // replace with canvas
+  var canvas = document.createElement("canvas");
+  canvas.id = "canvas: " + stockData["index"];
+  var section = document.getElementById("section: " + stockData["index"]);
+  section.innerHTML = "";
+  section.appendChild(canvas);
 
-  stockChart = new Chart(context, {
+  // get the context
+  var context = canvas.getContext("2d");
+
+  var chart = new Chart(context, {
     type: "line",
     data: {
       labels: stockData["labels"],
-      datasets: [
-        {
-          label: stockData["function"],
-          data: stockData["data"]
-        }
-      ]
+      datasets: [{
+        label: stockData["function"],
+        data: stockData["data"]
+      }]
     }
   })
+
+  // // Destroy the stock chart if it's been instantiated
+  // if(stockChart != null)
+  //   stockChart.destroy();
+  //
+  // stockChart = new Chart(context, {
+  //   type: "line",
+  //   data: {
+  //     labels: stockData["labels"],
+  //     datasets: [
+  //       {
+  //         label: stockData["function"],
+  //         data: stockData["data"]
+  //       }
+  //     ]
+  //   }
+  // })
 
 
 }
